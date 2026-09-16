@@ -1,0 +1,21 @@
+[Unit]
+Description=X-Air Network Bridge (USB capture → UDP)
+After=__AFTER__
+Wants=__WANTS__
+
+[Service]
+Type=simple
+WorkingDirectory=__ROOT__
+Environment=PYTHONPATH=__ROOT__
+ExecStart=__PYTHON__ -m src.cli xair_network_bridge_server
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+TimeoutStopSec=15
+Restart=on-failure
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+__EXTRA__
+
+[Install]
+WantedBy=__WANTED_BY__

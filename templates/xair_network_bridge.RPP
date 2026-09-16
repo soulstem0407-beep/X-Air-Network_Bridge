@@ -1,0 +1,486 @@
+<REAPER_PROJECT 0.1 "7.0" 0
+  RIPPLE 0
+  GROUPOVERRIDE 0 0 0
+  AUTOXFADE 1
+  ENVATTACH 1
+  MIXERUIFLAGS 11 48
+  CURSOR 0
+  ZOOM 100 0 0
+  VZOOMEX 6 0
+  RECMODE 1
+  LOOP 0
+  RECORD_PATH "Media" ""
+  SAMPLERATE 48000 0 0
+  TEMPO 120 4 4
+  PLAYRATE 1 0 0.25 4
+  MASTERAUTOMODE 0
+  MASTERHWOUT 0 0 1 0 0 0 0 0
+  MASTER_NCH 2
+  MASTER_VOLUME 1 0 -1 -1 1
+  MASTER_FX 1
+  <NOTES 0 2
+    |X-Air Network Bridge — REAPER template
+    |Generic 18-channel layout (CH01–CH18). No user paths, no desk names.
+    |Linux JACK: xair_net_bridge:NN_*_out = REAPER inputs; *_in = outputs
+    |Windows: WASAPI/ASIO virtual cable (VB-Cable). macOS: CoreAudio BlackHole.
+    |USB Return: last track, post-fader sends from 1–18, HWOUT 1–2 (stereo)
+    |Plugins: always on track/bus OUTPUT feeding USB Return. Never input FX.
+    |OSC: load ./reaper-osc/xair_network_bridge.ReaperOSC  listen 8000 → dest 127.0.0.1:9001
+  >
+  <TRACK {5b66ea76-64e0-4859-8a85-a852e516a8f0}
+    NAME "01_CH01"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 0 1 1 0 0 0 0
+    VU 2
+    TRACKID {5b66ea76-64e0-4859-8a85-a852e516a8f0}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {9fe538d9-f893-4b53-ba11-1bdc844c64d3}
+    NAME "02_CH02"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 1 1 1 0 0 0 0
+    VU 2
+    TRACKID {9fe538d9-f893-4b53-ba11-1bdc844c64d3}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {c40c4a52-570f-47c9-991d-a44805006644}
+    NAME "03_CH03"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 2 1 1 0 0 0 0
+    VU 2
+    TRACKID {c40c4a52-570f-47c9-991d-a44805006644}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {94aa607a-b6e5-4bd0-8b40-db45973e424c}
+    NAME "04_CH04"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 3 1 1 0 0 0 0
+    VU 2
+    TRACKID {94aa607a-b6e5-4bd0-8b40-db45973e424c}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {a1b15c31-f1d2-4195-af94-755d58762056}
+    NAME "05_CH05"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 4 1 1 0 0 0 0
+    VU 2
+    TRACKID {a1b15c31-f1d2-4195-af94-755d58762056}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {a299eb9e-79b4-4538-8c87-ebc70f87880b}
+    NAME "06_CH06"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 5 1 1 0 0 0 0
+    VU 2
+    TRACKID {a299eb9e-79b4-4538-8c87-ebc70f87880b}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {cac6e431-1985-4b5f-abd4-b232fca3a792}
+    NAME "07_CH07"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 6 1 1 0 0 0 0
+    VU 2
+    TRACKID {cac6e431-1985-4b5f-abd4-b232fca3a792}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {d921e094-f293-41c0-88ce-18506603cd44}
+    NAME "08_CH08"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 7 1 1 0 0 0 0
+    VU 2
+    TRACKID {d921e094-f293-41c0-88ce-18506603cd44}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {25ca8b1a-a9a6-421a-abe0-8cd397810f1f}
+    NAME "09_CH09"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 8 1 1 0 0 0 0
+    VU 2
+    TRACKID {25ca8b1a-a9a6-421a-abe0-8cd397810f1f}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {3f84fe29-42b6-4bb0-bba0-d87632a2e31e}
+    NAME "10_CH10"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 9 1 1 0 0 0 0
+    VU 2
+    TRACKID {3f84fe29-42b6-4bb0-bba0-d87632a2e31e}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {fc091edc-fc2d-43aa-a508-2e4fa315271e}
+    NAME "11_CH11"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 10 1 1 0 0 0 0
+    VU 2
+    TRACKID {fc091edc-fc2d-43aa-a508-2e4fa315271e}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {54505c8b-f2fc-46c7-bda2-bf2a58442e04}
+    NAME "12_CH12"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 11 1 1 0 0 0 0
+    VU 2
+    TRACKID {54505c8b-f2fc-46c7-bda2-bf2a58442e04}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {6dbd1011-8e46-46b8-a529-c24af18e2c2a}
+    NAME "13_CH13"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 12 1 1 0 0 0 0
+    VU 2
+    TRACKID {6dbd1011-8e46-46b8-a529-c24af18e2c2a}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {14e3e4b1-6fd1-41dc-ac62-2815fc6c9f68}
+    NAME "14_CH14"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 13 1 1 0 0 0 0
+    VU 2
+    TRACKID {14e3e4b1-6fd1-41dc-ac62-2815fc6c9f68}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {cd4afb3c-3264-4167-a3ee-7b78ea1cb6d7}
+    NAME "15_CH15"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 14 1 1 0 0 0 0
+    VU 2
+    TRACKID {cd4afb3c-3264-4167-a3ee-7b78ea1cb6d7}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {9424c0c7-dd41-46a0-b689-0d797b903938}
+    NAME "16_CH16"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 15 1 1 0 0 0 0
+    VU 2
+    TRACKID {9424c0c7-dd41-46a0-b689-0d797b903938}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {14318313-151f-48e5-b170-080f319e9043}
+    NAME "17_CH17"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 16 1 1 0 0 0 0
+    VU 2
+    TRACKID {14318313-151f-48e5-b170-080f319e9043}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {09cf553f-70e0-4b33-9e33-dab508ad2969}
+    NAME "18_CH18"
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 17 1 1 0 0 0 0
+    VU 2
+    TRACKID {09cf553f-70e0-4b33-9e33-dab508ad2969}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 1 0
+    AUXSEND 18 0 0 0 0 0 0 0 0 -1:U 0 -1 ''
+  >
+  <TRACK {a1838ed8-d31f-4d2b-8026-5f3a16a88294}
+    NAME "USB_Return"
+    PEAKCOL 255
+    BEAT -1
+    AUTOMODE 0
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    NCHAN 2
+    FX 1
+    TRACKHEIGHT 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NRECARM 0
+    REC 0 -1 0 0 0 0 0 0
+    VU 2
+    TRACKID {a1838ed8-d31f-4d2b-8026-5f3a16a88294}
+    PERF 0
+    MIDIOUT -1
+    MAINSEND 0 0
+    HWOUT 0 0 1 0 0 0 0 0
+  >
+>

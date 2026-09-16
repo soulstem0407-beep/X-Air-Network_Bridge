@@ -1,0 +1,7 @@
+sounddevice>=0.4.6
+numpy>=1.26.0
+python-dotenv>=1.0.1
+click>=8.1.7
+soundfile>=0.12.1
+JACK-Client>=0.5.3
+python-osc>=1.8.0

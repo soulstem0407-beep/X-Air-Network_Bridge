@@ -1,0 +1,77 @@
+# Local environment (never publish)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Runtime snapshots / local state
+.xair_*.json
+.xair_record_cmd
+
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Build / release artifacts
+dist/
+build/
+*.egg
+*.deb
+*.tar.gz
+*.whl
+
+# Audio captures and logs
+recordings/
+*.wav
+*.aif
+*.aiff
+*.flac
+*.log
+logs/
+*.tmp
+*.temp
+*.bak
+*~
+
+# Secrets / credentials / certificates
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_ed25519
+*.secret
+*credentials*
+*secrets.json
+auth.json
+token.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# User-specific DAW / JACK copies (keep repo templates/)
+*.RPP-bak
+*.rpp-bak
+reaper.ini
+QjackCtl.conf
