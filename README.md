@@ -1,8 +1,12 @@
-# X-Air Network Bridge
+# X-AIR Network Audio Bridge
 
-USB class-audio from a Behringer X18/XR18 → 18-channel `XBRI` UDP → JACK/PipeWire (or a virtual cable) for the DAW. Optional OSC to the desk, sidecar WAV recorder, stereo USB return for hybrid FX.
+Transport X-Air multitrack audio over Ethernet and make it available on another workstation without requiring a direct USB connection between the mixer and the DAW.
+
+USB class-audio stays on the mixer PC (X18/XR18) → 18-channel `XBRI` UDP → JACK/PipeWire for the DAW. Optional OSC to the desk, sidecar WAV recorder, stereo USB return for hybrid FX.
 
 **New to this?** Start here: [`INSTRUCCIONES_PARA_DUMMIES.md`](INSTRUCCIONES_PARA_DUMMIES.md) (plain-language steps).
+
+**Fresh boot → audio + OSC demo** (community cheat sheet): [`docs/DEMO.md`](docs/DEMO.md).
 
 Install, CLI, and JACK/PipeWire troubleshooting: [`docs/README.md`](docs/README.md). OSC: [`docs/OSC.md`](docs/OSC.md), [`docs/OSC_LAUNCHER.md`](docs/OSC_LAUNCHER.md). DAWs: [`docs/DAW.md`](docs/DAW.md).
 
@@ -14,6 +18,7 @@ cp .env.example .env
 # Set YOUR mixer IP. Placeholder only:
 # XAIR_OSC_HOST=192.168.1.100
 bash scripts/xair-network-bridge --help
+bash scripts/xair clean                 # hung PIDs, UDP ports, corrupt state
 bash scripts/xair_network_bridge_server.sh   # USB mixer PC
 bash scripts/xair_network_bridge_client.sh   # DAW PC
 ./xair_network_bridge_doctor.sh              # read-only check
@@ -28,13 +33,13 @@ bash launchers/xair_network_bridge/xair_network_bridge_bitwig_setup.sh
 
 The official **X AIR app** is the visual remote for the mixer. This project is the **network multicore into the DAW**. They complement each other; they do not replace each other.
 
-## X AIR App vs X-Air Network Bridge
+## X AIR App vs X-Air Network Audio Bridge
 
-| Feature | X AIR App | X-Air Network Bridge |
+| Feature | X AIR App | X-Air Network Audio Bridge |
 | --- | --- | --- |
 | Console control (faders, EQ, dyn, FX) | Yes. Touch/desktop UI for live mix. | Partial. OSC CLI, `osc-launcher` / `start-reaper-sync`, write-back. Not a mixer GUI. |
 | OSC control | Desk → app only. No DAW sync. | Yes. Desk ↔ DAW (fader, mute, pan, names, sends, buses, LR) and CLI one-shots. |
-| Network audio (LAN/Wi‑Fi) | No. 18-ch USB stays on the PC plugged into the desk. | Yes. `xair_network_bridge_server` captures USB; `xair_network_bridge_client` receives 18 ch (`XBRI`; jitter, optional FEC/Opus). |
+| Network audio (LAN/Wi‑Fi) | No. 18-ch USB stays on the PC plugged into the desk. | Yes. `start-server` captures USB; `start-client` receives 18 ch (`XBRI`; jitter, optional FEC/Opus). |
 | DAW integration (REAPER, Bitwig, Ardour) | No. The app is not an 18-stem audio interface. | Yes. Linux JACK/PipeWire client `xair_net_bridge`: 18 in + 18 out. |
 | JACK/PipeWire ports | No. | Yes. Duplex `*_in` / `*_out`, OSC stems (`01_Kick_in` / `01_Kick_out`). |
 | 18-channel recorder | No (unless you record elsewhere). | Yes. Sidecar PCM24 WAV per channel (`record-start`). Independent of the DAW. |
@@ -53,7 +58,7 @@ The official **X AIR app** is the visual remote for the mixer. This project is t
 - **Audio-over-IP (LAN/Wi‑Fi)** — 18 channels, default **PCM24**, `XBRI` UDP. USB stays at the mixer; the DAW can be elsewhere.
 - **Adaptive jitter, FEC, drift = 0** — Client jitter buffer + sequence reorder. Optional `XAIR_FEC` / `XAIR_OPUS`. On a clean Ethernet LAN, target `sync-status`: `jitter_ema≈0`, `drift=0`, `loss_ppm=0`. Wi‑Fi is best-effort.
 - **REAPER, Bitwig, Ardour** — Any JACK host. Same `xair_net_bridge` device.
-- **18 inputs + 18 outputs via JACK/PipeWire** — Permanent full-duplex. Forced graph: System → X-Air Network Bridge → DAW → System (analog, never HDMI).
+- **18 inputs + 18 outputs via JACK/PipeWire** — Permanent full-duplex. Default patchbay is **manual** (qpwgraph/REAPER/Bitwig). Optional `XAIR_JACK_FORCE_GRAPH=true`: System → X-Air Network Bridge → REAPER → System (analog, never HDMI).
 - **Hybrid analog + digital mix** — Preamps and faders on the X18; stems, buses, and plugins in the DAW.
 - **Stems, buses, digital FX, USB return** — Named OSC stems into the DAW; stereo wet return to the desk as extra FX.
 - **CLI and OSC automation** — Faders, mute, names, scenes, recorder, `osc-launcher`.
@@ -63,7 +68,7 @@ The official **X AIR app** is the visual remote for the mixer. This project is t
 
 REAPER (or Bitwig/Ardour) can run Valhalla, Waves, FabFilter, SSL, iZotope, Auto-Tune, etc., and send the **wet** signal back to the X18 over **USB return**, as if those plugins were extra console FX (not the four built-in X AIR engines).
 
-**Flow:** X18 USB capture → UDP → JACK `xair_net_bridge:NN_*_out` → DAW tracks → plugins on the **output** chain → stereo bus → `XAIR_RETURN_AUDIO` → UDP 50001 → `xair_network_bridge_server` USB playback → X18 Routing USB 1–2 into the live mix.
+**Flow:** X18 USB capture → UDP → JACK `xair_net_bridge:NN_*_out` → DAW tracks → plugins on the **output** chain → stereo bus → `XAIR_RETURN_AUDIO` → UDP 50001 → `start-server` USB playback → X18 Routing USB 1–2 into the live mix.
 
 The X AIR app cannot do this: no plugin host, no 18-stem network feed, no third-party DSP back into the desk.
 
@@ -111,7 +116,7 @@ The DAW is a rack on an aux. FOH dry is the channel fader. If the USB feed into 
 
 ## Multitrack recorder (18 channels)
 
-Sidecar on `xair_network_bridge_client`: one PCM24 WAV per channel under `XAIR_RECORD_PATH` (default `recordings/`, session folders `YYYYMMDDTHHMMSSZ/`). The UDP thread only `copy` + `put_nowait`; the JACK callback never hits disk.
+Sidecar on `start-client`: one PCM24 WAV per channel under `XAIR_RECORD_PATH` (default `recordings/`, session folders `YYYYMMDDTHHMMSSZ/`). The UDP thread only `copy` + `put_nowait`; the JACK callback never hits disk.
 
 ```bash
 # Client already running
@@ -159,7 +164,7 @@ Recording 18 channels turns any gig into a **studio session you already tracked*
 OSC one-shots talk to the X18 (`XAIR_OSC_HOST` / `XAIR_OSC_IP`). Combine with `osc-launcher` for REAPER follow. Mute CLI: **1 = muted**, **0 = open**.
 
 ```bash
-PYTHONPATH=. python3 -m src.cli xair-network-set-fader 1 --value 0.75
+PYTHONPATH=. python3 -m src.cli xair-set-fader 1 --value 0.75
 PYTHONPATH=. python3 -m src.cli xair-set-mute  1 --value 1
 PYTHONPATH=. python3 -m src.cli xair-set-pan   1 --value 0.5
 PYTHONPATH=. python3 -m src.cli xair-set-send  1 1 --value 0.3
@@ -178,10 +183,10 @@ Channel names: `get_channel_name` / `set_channel_name` in OSC (see [`docs/OSC.md
 
 Bitwig on Linux uses JACK/PipeWire the same way REAPER does.
 
-1. PipeWire JACK running; `xair_network_bridge_client` already created `xair_net_bridge`.
-2. Bitwig → Settings → Audio → **JACK** (PipeWire). Sample rate **48000**, block size = QjackCtl Frames/Period (64 or 128).
-3. **Inputs:** 18 sources `xair_net_bridge:NN_*_out` (dry from the X18). Create 18 tracks or a multi-in chain.
-4. **Outputs:** do not use HDMI. Hybrid FX: stereo bus → device that `XAIR_RETURN_INPUT_DEVICE` captures. Main monitors: analog System playback (the X-Air Network Bridge patchbay already aims System → X-Air Network Bridge → DAW → System).
+1. PipeWire JACK running; `start-client` already created `xair_net_bridge`.
+2. Bitwig → Settings → Audio → **JACK** (PipeWire). Sample rate **48000**, block size = QjackCtl Frames/Period (64 or 128). The PipeWire stereo “audio engine” auto-links to the default device and will not record 18 stems.
+3. **Inputs:** 18 sources `xair_net_bridge:NN_*_out` (dry from the X18). Patch in qpwgraph. Create 18 tracks or a multi-in chain.
+4. **Outputs:** do not use HDMI. Hybrid FX: stereo bus → device that `XAIR_RETURN_INPUT_DEVICE` captures. Main monitors: analog System playback. Leave qpwgraph **Patchbay → Activated** OFF while you recable.
 5. **Plugins:** on the **track/device output** chain (or a send to an FX track whose output is the return bus). Never on hardware input FX. POST-fader sends to that FX track.
 6. `XAIR_RETURN_AUDIO=true` and X18 USB 1–2 as for REAPER.
 
