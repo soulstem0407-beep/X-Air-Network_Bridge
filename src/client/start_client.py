@@ -194,7 +194,7 @@ def build_network_receiver(
         samples_per_packet=int(cfg["samples_per_packet"]),
         jitter_packets=int(cfg["jitter_packets"]),
         output_device_query=cfg["output_device_query"],
-        blocksize=max(8, int(cfg["samples_per_packet"])),
+        blocksize=max(64, int(cfg.get("audio_blocksize", 256))),
         metrics_log_interval_s=float(cfg["metrics_interval_s"]),
         wasapi_exclusive=bool(cfg["wasapi_exclusive"]),
         audio_levels_hook=hook,

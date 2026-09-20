@@ -13,6 +13,8 @@ Objetivo: minimizar tamaño de buffer **sin romper por jitter** UDP (sin retrans
 | `XAIR_JITTER_COVER` | Factor de cobertura: target ≈ ceil(cover × jitter_ema / duración_paquete). Defecto **3**. |
 | `XAIR_FEC` | `true` activa XOR FEC (un datagrama de paridad por grupo). `false` (defecto) = UDP crudo. Activar en **emisor y receptor**. |
 | `XAIR_FEC_GROUP` | Tamaño de grupo (defecto **3**, rango 2–16). El receptor reconstruye **una** pérdida por grupo. Añade ~N−1 paquetes de espera en el hilo UDP, no en el callback de audio. |
+| `XAIR_AUDIO_BLOCKSIZE` | Bloque del dispositivo/callback de audio (defecto **256**). Independiente de `XAIR_SAMPLES_PER_PACKET`; usa normalmente 64/128/256 según estabilidad del driver. |
+| `XAIR_SAMPLES_PER_PACKET` | Muestras por datagrama XBRI (defecto **21** para PCM24/18ch). Mantener pequeño evita fragmentación IP; no cambia el quantum de JACK ni el bloque USB. |
 | `XAIR_OPUS` | `true` envía Opus (hilo UDP send) en lugar de PCM. `false` (defecto) = PCM/FLAC. Activar en **ambos** extremos. |
 | `XAIR_OPUS_BITRATE` | Bitrate **total** (defecto **128000**), repartido entre pares estéreo. |
 | `XAIR_OPUS_FRAME` | Duración de frame Opus en ms (2.5/5/10/**20**/40/60). Típico 10–20. |

@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Decouple the audio callback block (`XAIR_AUDIO_BLOCKSIZE`, default 256) from XBRI UDP packetization (`XAIR_SAMPLES_PER_PACKET`, default 21).
 - Preserve Opus flags and exact variable payload lengths when XOR FEC reconstructs a lost packet.
 - Reject incompatible FEC group metadata instead of silently merging it.
 - Validate XBRI version, flags, sample rate, channels, frame counts and media payload sizes.

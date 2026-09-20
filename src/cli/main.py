@@ -118,6 +118,10 @@ def _merged_config() -> dict:
         "jitter_packets": jitter_n,
         "jitter_config": jitter_cfg,
         "samples_per_packet": max(8, _int_env("XAIR_SAMPLES_PER_PACKET", 21)),
+        # Audio callbacks and UDP packetization are intentionally independent.
+        # JACK/ALSA commonly run at 64/128/256 frames while XBRI uses smaller
+        # datagrams to stay below the network MTU.
+        "audio_blocksize": max(64, min(2048, _int_env("XAIR_AUDIO_BLOCKSIZE", 256))),
         "codec": _str_env("XAIR_CODEC", "PCM24"),
         "sample_rate": _int_env("XAIR_SAMPLE_RATE", 48000),
         "channels": _int_env("XAIR_CHANNELS", 18),
@@ -249,7 +253,7 @@ def start_server_cmd() -> None:
         sample_rate=cfg["sample_rate"],
         channels=cfg["channels"],
         device_query=cfg["input_device_query"],
-        blocksize=cfg["samples_per_packet"],
+        blocksize=cfg["audio_blocksize"],
     )
     capture = USBCapture(capture_cfg)
     return_rx = None
@@ -288,10 +292,11 @@ def start_server_cmd() -> None:
     try:
         capture.start(cb)
         log.info(
-            "Servidor activo → %s:%s codec=%s samples/pkt=%s fec=%s group=%s opus=%s bitrate=%s frame=%.1fms discovery=%s",
+            "Servidor activo → %s:%s codec=%s audio_block=%s samples/pkt=%s fec=%s group=%s opus=%s bitrate=%s frame=%.1fms discovery=%s",
             sender.host,
             cfg["udp_port"],
             cfg["codec"],
+            cfg["audio_blocksize"],
             cfg["samples_per_packet"],
             "on" if cfg["fec_enabled"] else "off",
             cfg["fec_group"],
