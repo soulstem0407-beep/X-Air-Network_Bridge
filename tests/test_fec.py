@@ -115,7 +115,7 @@ class EncoderTests(unittest.TestCase):
         self.assertTrue(is_fec_packet(fec_hdr))
         self.assertEqual(fec_hdr.seq, 0)
         self.assertEqual(fec_hdr.extra, enc.group)
-        self.assertEqual(fec_pl, xor_bytes(payloads))
+        self.assertTrue(fec_pl.startswith(b"XF2\x00"))
         self.assertEqual([h.seq for h, _ in media], [0, 1, 2])
 
     def test_disabled_encoder_not_used_when_none(self) -> None:
@@ -123,6 +123,33 @@ class EncoderTests(unittest.TestCase):
         hdr = _hdr(seq=0, extra=0, flags=0)
         self.assertFalse(is_fec_packet(hdr))
         self.assertEqual(hdr.extra, 0)
+
+    def test_opus_flag_and_variable_length_survive_recovery(self) -> None:
+        payloads = [b"a", b"variable", b"xyz"]
+        enc = FecEncoder(3)
+        media = []
+        fec = None
+        for i, payload in enumerate(payloads):
+            extra = enc.position_for_next()
+            hdr = _hdr(seq=i, extra=extra, flags=2, nframes=960)
+            media.append((hdr, payload))
+            fec = enc.add_media(
+                codec=Codec.PCM24,
+                sample_rate=48000,
+                channels=2,
+                nframes=960,
+                seq=i,
+                payload=payload,
+                flags=2,
+            )
+        assert fec is not None
+        fh, fp = parse_header(fec)
+        asm = FecAssembler(3)
+        out = asm.ingest_media(*media[0]) + asm.ingest_media(*media[2])
+        out += asm.ingest_fec(fh, fp)
+        recovered = next((h, p) for h, p in out if h.seq == 1)
+        self.assertEqual(recovered[1], payloads[1])
+        self.assertEqual(recovered[0].flags, 2)
 
 
 class AssemblerTests(unittest.TestCase):

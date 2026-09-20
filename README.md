@@ -56,13 +56,13 @@ The official **X AIR app** is the visual remote for the mixer. This project is t
 ## Advanced X-Air Network Bridge benefits
 
 - **Audio-over-IP (LAN/Wi‑Fi)** — 18 channels, default **PCM24**, `XBRI` UDP. USB stays at the mixer; the DAW can be elsewhere.
-- **Adaptive jitter, FEC, drift = 0** — Client jitter buffer + sequence reorder. Optional `XAIR_FEC` / `XAIR_OPUS`. On a clean Ethernet LAN, target `sync-status`: `jitter_ema≈0`, `drift=0`, `loss_ppm=0`. Wi‑Fi is best-effort.
+- **Adaptive jitter and optional FEC/Opus** — Client jitter buffer + sequence reorder. `sync-status` reports local timing indicators; its `drift` value is **not** a shared-clock or PTP measurement. Clean wired Ethernet is recommended. Wi‑Fi is best-effort.
 - **REAPER, Bitwig, Ardour** — Any JACK host. Same `xair_net_bridge` device.
 - **18 inputs + 18 outputs via JACK/PipeWire** — Permanent full-duplex. Default patchbay is **manual** (qpwgraph/REAPER/Bitwig). Optional `XAIR_JACK_FORCE_GRAPH=true`: System → X-Air Network Bridge → REAPER → System (analog, never HDMI).
 - **Hybrid analog + digital mix** — Preamps and faders on the X18; stems, buses, and plugins in the DAW.
 - **Stems, buses, digital FX, USB return** — Named OSC stems into the DAW; stereo wet return to the desk as extra FX.
 - **CLI and OSC automation** — Faders, mute, names, scenes, recorder, `osc-launcher`.
-- **Functional Dante/AVB stand-in** — Not a Dante/AES67 stack. USB class-audio + unicast UDP when you have no AoIP stagebox.
+- **Practical X-Air LAN bridge** — Not Dante, AVB, AES67 or a replacement for their clocking, interoperability, redundancy or security. It is USB class-audio + unicast UDP for a controlled LAN.
 
 ## Hybrid FX (REAPER → X18)
 
@@ -200,6 +200,12 @@ It does **not** offer network audio, DAW integration (REAPER/Bitwig/Ardour), an 
 
 The **X-Air Network Bridge** fills that gap for advanced users, **Linux**, broadcast, DAWs, and hybrid live/studio workflows: desk on stage, DAW in another room, named stems, optional recorder and USB return — without replacing the app for mixing FOH on the X18.
 
+## Scope, alternatives, and security
+
+NetJACK is an established alternative when the requirement is JACK audio transport between computers. This project is justified by its X18-specific workflow: USB capture at the desk, OSC control and naming, scenes, recorder, dashboard, packaging, and guarded stereo return. Evaluate both on the same hardware; this project does not claim lower latency or greater reliability without measurements.
+
+XBRI and OSC are intended for a **trusted, isolated LAN**. They are not encrypted. The client filters XBRI audio by `XAIR_PEER_HOST`, but that is not cryptographic authentication. Use host firewalls and a VPN such as WireGuard across untrusted networks. See [`SECURITY.md`](SECURITY.md).
+
 ## Support the Project
 
 This project is **free and open**. Anyone can use the bridge — no account, no license fee, no paywall.
@@ -220,9 +226,8 @@ GPLv3 is there to protect the author and the community:
 
 - It keeps others from taking the code, claiming it as their own, or shipping it as closed software.
 - Anyone who distributes a modified version must keep that version open under GPLv3 (copyleft).
-- Community contributions stay in the commons: improvements come back as source, not as a private fork behind a paywall.
+- Distributed modified versions must satisfy GPLv3 source obligations. Private modifications that are not conveyed generally do not have to be published.
 - Voluntary donations (see Support above) are compatible with GPLv3. Charging for copies or support is allowed; locking the source is not.
-- Third parties may use and study the bridge, including commercially, but they cannot turn this project into proprietary software.
+- Third parties may use and study the bridge, including commercially; when they convey covered binaries or modified versions, GPLv3 obligations apply.
 
 You may run, share, and modify the bridge under GPLv3. The full legal text is in [`LICENSE`](LICENSE).
-

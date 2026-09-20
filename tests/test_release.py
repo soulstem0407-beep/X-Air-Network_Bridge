@@ -44,13 +44,13 @@ def _parse_ar(blob: bytes) -> dict[str, bytes]:
 class StampTests(unittest.TestCase):
     def test_stamp_has_version_and_flags(self) -> None:
         text = format_release_stamp(
-            version="0.1.0",
+            version="0.1.1",
             build_ts=1700000000.0,
             cflags="-O2 -g0",
             ldflags="-s",
             stripped=True,
         )
-        self.assertIn("release_version=0.1.0", text)
+        self.assertIn("release_version=0.1.1", text)
         self.assertIn("release_build_ts=1700000000.0", text)
         self.assertIn("cflags=-O2 -g0", text)
         self.assertIn("stripped_binaries=1", text)
@@ -77,7 +77,7 @@ class PipelineTests(unittest.TestCase):
                 clear=False,
             ):
                 snap = build_release(root, dest_dir=dest)
-            self.assertEqual(snap["release_version"], "0.1.0")
+            self.assertEqual(snap["release_version"], "0.1.1")
             self.assertEqual(snap["release_build_ts"], 1700000000.0)
             self.assertTrue(snap["reproducible"])
             self.assertIn("-O2", str(snap["cflags"]))
@@ -88,7 +88,7 @@ class PipelineTests(unittest.TestCase):
             self.assertTrue(deb.is_file())
             self.assertTrue(tgz.is_file())
             self.assertTrue(stamp.is_file())
-            self.assertIn("release_version=0.1.0", stamp.read_text(encoding="utf-8"))
+            self.assertIn("release_version=0.1.1", stamp.read_text(encoding="utf-8"))
             units = [Path(p) for p in arts["systemd"]]
             self.assertEqual(len(units), 2)
             for u in units:
@@ -103,15 +103,15 @@ class PipelineTests(unittest.TestCase):
                 )
                 assert relf is not None
                 body = relf.read().decode("utf-8")
-            self.assertIn(f"{PACKAGE_NAME}-0.1.0/RELEASE", names)
-            self.assertIn("release_version=0.1.0", body)
+            self.assertIn(f"{PACKAGE_NAME}-0.1.1/RELEASE", names)
+            self.assertIn("release_version=0.1.1", body)
             members = _parse_ar(deb.read_bytes())
             data = gzip.decompress(members["data.tar.gz"])
             with tarfile.open(fileobj=io.BytesIO(data), mode="r:") as tar:
                 dnames = [m.name for m in tar.getmembers()]
             self.assertTrue(any(n.endswith("/RELEASE") for n in dnames))
             side = json.loads(snap_path.read_text(encoding="utf-8"))
-            self.assertEqual(side["release_version"], "0.1.0")
+            self.assertEqual(side["release_version"], "0.1.1")
             self.assertEqual(side["release_build_ts"], 1700000000.0)
             launcher = arts.get("launcher")
             if launcher:
@@ -119,7 +119,7 @@ class PipelineTests(unittest.TestCase):
                 self.assertTrue(lp.is_file())
                 blob = lp.read_bytes()
                 self.assertTrue(blob.startswith(b"\x7fELF"))
-                self.assertIn(b"XAIR_RELEASE_VERSION=0.1.0", blob)
+                self.assertIn(b"XAIR_RELEASE_VERSION=0.1.1", blob)
 
     def test_same_epoch_is_bit_reproducible(self) -> None:
         root = _repo_root()
@@ -153,7 +153,7 @@ class PipelineTests(unittest.TestCase):
 
 class SnapshotTests(unittest.TestCase):
     def test_dashboard_and_sync_merge(self) -> None:
-        snap = {"release_version": "0.1.0", "release_build_ts": 11.0}
+        snap = {"release_version": "0.1.1", "release_build_ts": 11.0}
         payload = {
             "schema": 1,
             "active": True,
@@ -165,12 +165,12 @@ class SnapshotTests(unittest.TestCase):
             path = root / ".xair_sync_state.json"
             path.write_text(json.dumps(payload), encoding="utf-8")
             view = build_view(path, payload, now=path.stat().st_mtime)
-            self.assertEqual(view.release["release_version"], "0.1.0")
+            self.assertEqual(view.release["release_version"], "0.1.1")
             self.assertEqual(view.release["release_build_ts"], 11.0)
             with mock.patch.dict(os.environ, {"XAIR_RELEASE_STATE_PATH": ""}, clear=False):
                 persist_release_snapshot(snap, project_root=root, sync_state_path=path)
             merged = json.loads(path.read_text(encoding="utf-8"))
-            self.assertEqual(merged["report"]["release"]["release_version"], "0.1.0")
+            self.assertEqual(merged["report"]["release"]["release_version"], "0.1.1")
 
 
 if __name__ == "__main__":
