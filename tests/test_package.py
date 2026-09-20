@@ -41,12 +41,12 @@ def _parse_ar(blob: bytes) -> dict[str, bytes]:
 
 class VersionTests(unittest.TestCase):
     def test_read_version_file(self) -> None:
-        self.assertEqual(read_version(_repo_root()), "0.1.0")
+        self.assertEqual(read_version(_repo_root()), "0.1.1")
 
 
 class ControlTests(unittest.TestCase):
     def test_depends_include_python_and_portaudio(self) -> None:
-        text = debian_control("0.1.0")
+        text = debian_control("0.1.1")
         self.assertIn("python3 (>= 3.10)", text)
         self.assertIn("libportaudio2", text)
         self.assertIn("python3-jack-client", text)
@@ -90,10 +90,10 @@ class TarballTests(unittest.TestCase):
             self.assertTrue(any(n.endswith("sounddevice.py") for n in names))
             self.assertTrue(any(n.endswith("_sounddevice.py") for n in names))
             self.assertFalse(any(".venv" in n for n in names))
-            self.assertEqual(meta["package_version"], "0.1.0")
+            self.assertEqual(meta["package_version"], "0.1.1")
             self.assertEqual(meta["package_build_ts"], 1700000000.0)
             side = json.loads(snap_path.read_text(encoding="utf-8"))
-            self.assertEqual(side["package_version"], "0.1.0")
+            self.assertEqual(side["package_version"], "0.1.1")
             self.assertIsNotNone(side["package_build_ts"])
 
 
@@ -112,7 +112,7 @@ class DebTests(unittest.TestCase):
                 clear=False,
             ):
                 deb = build_deb(root, dest_dir=dest)
-            self.assertTrue(deb.name.endswith("_0.1.0_all.deb"))
+            self.assertTrue(deb.name.endswith("_0.1.1_all.deb"))
             members = _parse_ar(deb.read_bytes())
             self.assertIn("debian-binary", members)
             self.assertEqual(members["debian-binary"].startswith(b"2.0"), True)
@@ -150,7 +150,7 @@ class DebTests(unittest.TestCase):
 
 class SnapshotTests(unittest.TestCase):
     def test_dashboard_and_sync_merge(self) -> None:
-        snap = {"package_version": "0.1.0", "package_build_ts": 9.0}
+        snap = {"package_version": "0.1.1", "package_build_ts": 9.0}
         payload = {
             "schema": 1,
             "active": True,
@@ -162,12 +162,12 @@ class SnapshotTests(unittest.TestCase):
             path = root / ".xair_sync_state.json"
             path.write_text(json.dumps(payload), encoding="utf-8")
             view = build_view(path, payload, now=path.stat().st_mtime)
-            self.assertEqual(view.package["package_version"], "0.1.0")
+            self.assertEqual(view.package["package_version"], "0.1.1")
             self.assertEqual(view.package["package_build_ts"], 9.0)
             with mock.patch.dict(os.environ, {"XAIR_PACKAGE_STATE_PATH": ""}, clear=False):
                 persist_package_snapshot(snap, project_root=root, sync_state_path=path)
             merged = json.loads(path.read_text(encoding="utf-8"))
-            self.assertEqual(merged["report"]["package"]["package_version"], "0.1.0")
+            self.assertEqual(merged["report"]["package"]["package_version"], "0.1.1")
 
 
 if __name__ == "__main__":

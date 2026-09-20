@@ -27,6 +27,10 @@ HEADER_STRUCT = struct.Struct("!4sBBBBIHHIQ")
 HEADER_SIZE = HEADER_STRUCT.size
 FLAG_FEC = 0x01
 FLAG_OPUS = 0x02
+KNOWN_FLAGS = FLAG_FEC | FLAG_OPUS
+MAX_CHANNELS = 64
+MAX_NFRAMES = 8192
+MAX_SAMPLE_RATE = 384000
 
 
 def build_header(
@@ -95,6 +99,16 @@ def parse_header(buf: bytes) -> Tuple[ParsedHeader, bytes]:
     ) = HEADER_STRUCT.unpack_from(buf, 0)
     if mg != MAGIC:
         raise ValueError("magic inválido")
+    if ver != 1:
+        raise ValueError(f"versión XBRI no soportada: {ver}")
+    if flags_b & ~KNOWN_FLAGS:
+        raise ValueError(f"flags XBRI desconocidos: 0x{flags_b:02x}")
+    if not 8000 <= sr <= MAX_SAMPLE_RATE:
+        raise ValueError("sample rate XBRI fuera de rango")
+    if not 1 <= ch <= MAX_CHANNELS:
+        raise ValueError("canales XBRI fuera de rango")
+    if not 1 <= nf <= MAX_NFRAMES:
+        raise ValueError("nframes XBRI fuera de rango")
     payload = buf[HEADER_SIZE:]
     ph = ParsedHeader(
         version=int(ver),
@@ -108,6 +122,24 @@ def parse_header(buf: bytes) -> Tuple[ParsedHeader, bytes]:
         extra=int(extra_b),
     )
     return ph, payload
+
+
+def validate_payload(hdr: ParsedHeader, payload: bytes) -> None:
+    """Reject malformed media before it reaches FEC/codec allocation paths."""
+    if is_fec_packet(hdr):
+        if not payload:
+            raise ValueError("payload FEC vacío")
+        return
+    if is_opus_packet(hdr):
+        if not payload:
+            raise ValueError("payload Opus vacío")
+        return
+    if hdr.codec == Codec.PCM16 and len(payload) != hdr.nframes * hdr.channels * 2:
+        raise ValueError("tamaño payload PCM16 inconsistente")
+    if hdr.codec == Codec.PCM24 and len(payload) != hdr.nframes * hdr.channels * 3:
+        raise ValueError("tamaño payload PCM24 inconsistente")
+    if hdr.codec == Codec.FLAC and not payload:
+        raise ValueError("payload FLAC vacío")
 
 
 def inspect_packet_mtu(nframes: int, channels: int, codec: Codec) -> int:

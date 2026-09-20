@@ -205,6 +205,7 @@ def build_network_receiver(
         opus_enabled=bool(cfg.get("opus_enabled", False)),
         opus_bitrate=int(cfg.get("opus_bitrate", 128000)),
         opus_frame_ms=float(cfg.get("opus_frame_ms", 20.0)),
+        expected_peer_host=str(cfg.get("peer_host") or ""),
     )
     if sm is not None:
         def _metrics_provider() -> Optional[Dict[str, Any]]:

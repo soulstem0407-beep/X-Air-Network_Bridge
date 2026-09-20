@@ -177,6 +177,7 @@ class NetworkSender:
                 nframes=nframes,
                 seq=seq,
                 payload=payload,
+                flags=int(flags),
             )
             if fec_pkt is not None:
                 self._jbuf.push(fec_pkt)

@@ -37,6 +37,7 @@ from ..network_sender.protocol import (
     is_fec_packet,
     is_opus_packet,
     parse_header,
+    validate_payload,
 )
 from ..virtual_device import linux_virtual_output
 
@@ -94,11 +95,24 @@ class NetworkReceiver:
         opus_enabled: bool = False,
         opus_bitrate: int = DEFAULT_OPUS_BITRATE,
         opus_frame_ms: float = DEFAULT_OPUS_FRAME_MS,
+        expected_peer_host: Optional[str] = None,
     ) -> None:
         if sd is None:
             raise RuntimeError("sounddevice no disponible") from _IMPORT_ERR
         self.bind_host = bind_host
         self.port = int(port)
+        self.expected_peer_host = str(expected_peer_host or "").strip()
+        self._expected_peer_ips: set[str] = set()
+        if self.expected_peer_host and self.expected_peer_host.lower() != "auto":
+            try:
+                self._expected_peer_ips = {
+                    str(item[4][0])
+                    for item in socket.getaddrinfo(
+                        self.expected_peer_host, None, socket.AF_INET, socket.SOCK_DGRAM
+                    )
+                }
+            except socket.gaierror:
+                log.warning("No se pudo resolver peer UDP confiable %r", self.expected_peer_host)
         self.sample_rate = sample_rate
         self.channels = channels
         self.samples_per_packet = samples_per_packet
@@ -418,7 +432,7 @@ class NetworkReceiver:
         self._sock.settimeout(0.25)
         while not self._stop.is_set():
             try:
-                data, _addr = self._sock.recvfrom(65535)
+                data, addr = self._sock.recvfrom(65535)
             except socket.timeout:
                 if self._fec is not None:
                     self._deliver_ready(self._fec.on_idle())
@@ -427,10 +441,14 @@ class NetworkReceiver:
                 continue
             except OSError:
                 break
+            if self._expected_peer_ips and str(addr[0]) not in self._expected_peer_ips:
+                log.warning("datagrama XBRI ignorado desde peer no autorizado %s", addr[0])
+                continue
             if len(data) < HEADER_SIZE:
                 continue
             try:
                 hdr, payload = parse_header(data)
+                validate_payload(hdr, payload)
             except Exception as exc:
                 log.debug("paquete descartado: %s", exc)
                 continue
@@ -686,4 +704,3 @@ class NetworkReceiver:
 
         self._maybe_log_metrics(force=True)
         log.info("Cliente detenido. Resumen métricas: %s", self.metrics.snapshot())
-

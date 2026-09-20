@@ -6,6 +6,7 @@ or PortAudio playback callback. FEC packets do not consume media ``seq``.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
+import struct
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from .protocol import FLAG_FEC, Codec, ParsedHeader, build_header
@@ -16,6 +17,7 @@ MAX_FEC_GROUP = 16
 DEFAULT_FEC_GROUP = 3
 # Hold at most this many groups so a late FEC can still recover one hole.
 MAX_HELD_GROUPS = 2
+FEC_META_MAGIC = b"XF2\x00"
 
 
 def clamp_fec_group(n: int) -> int:
@@ -62,6 +64,7 @@ class FecEncoder:
         nframes: int,
         seq: int,
         payload: bytes,
+        flags: int = 0,
     ) -> Optional[bytes]:
         """Store a media payload. Returns a FEC datagram after every ``group`` packets."""
         if not self._payloads:
@@ -73,7 +76,16 @@ class FecEncoder:
         self._nframes = int(nframes)
         if len(self._payloads) < self.group:
             return None
-        xor_payload = xor_bytes(self._payloads)
+        # Carry the protected media flags and every original payload length.
+        # Compressed payloads (Opus/FLAC) are variable-sized, so a receiver
+        # cannot safely infer the missing size from a sibling packet.
+        lengths = b"".join(struct.pack("!H", len(p)) for p in self._payloads)
+        xor_payload = (
+            FEC_META_MAGIC
+            + bytes([int(flags) & ~FLAG_FEC & 0xFF, self.group])
+            + lengths
+            + xor_bytes(self._payloads)
+        )
         fec = (
             build_header(
                 codec=self._codec,
@@ -81,7 +93,7 @@ class FecEncoder:
                 channels=self._channels,
                 nframes=self._nframes,
                 seq=self._start_seq,
-                flags=FLAG_FEC,
+                flags=FLAG_FEC | (int(flags) & ~FLAG_FEC),
                 extra=self.group,
             )
             + xor_payload
@@ -96,6 +108,8 @@ class _Group:
     n: int
     media: Dict[int, Tuple[ParsedHeader, bytes]] = field(default_factory=dict)
     fec_payload: Optional[bytes] = None
+    media_flags: int = 0
+    payload_lengths: Optional[List[int]] = None
     closed: bool = False
 
 
@@ -122,7 +136,7 @@ class FecAssembler:
         if self._already_released(start):
             return []
         g = self._ensure(start)
-        g.media[pos] = (replace(hdr, flags=0, extra=pos, recovered=False), payload)
+        g.media[pos] = (replace(hdr, extra=pos, recovered=False), payload)
         self._maybe_close(g)
         self._evict(start)
         return self._collect()
@@ -132,8 +146,29 @@ class FecAssembler:
         if self._already_released(start):
             return []
         n = int(hdr.extra) if int(hdr.extra) >= MIN_FEC_GROUP else self.group
-        g = self._ensure(start, n=clamp_fec_group(n))
-        g.fec_payload = payload
+        n = clamp_fec_group(n)
+        g = self._ensure(start, n=n)
+        # The FEC header is authoritative. Refuse to merge incompatible local
+        # grouping instead of silently reconstructing the wrong sequence set.
+        if g.n != n:
+            self._force_close(g)
+            return self._collect()
+        g.media_flags = int(hdr.flags) & ~FLAG_FEC
+        meta_len = len(FEC_META_MAGIC) + 2 + (2 * n)
+        if payload.startswith(FEC_META_MAGIC) and len(payload) >= meta_len:
+            off = len(FEC_META_MAGIC)
+            g.media_flags = int(payload[off]) & ~FLAG_FEC
+            encoded_n = int(payload[off + 1])
+            if encoded_n != n:
+                self._force_close(g)
+                return self._collect()
+            off += 2
+            g.payload_lengths = [struct.unpack_from("!H", payload, off + 2 * i)[0] for i in range(n)]
+            g.fec_payload = payload[off + 2 * n :]
+        else:
+            # Backward-compatible reader for v1 parity packets. Fixed-size PCM
+            # remains recoverable; variable payload length cannot be guaranteed.
+            g.fec_payload = payload
         self._maybe_close(g)
         self._evict(start)
         return self._collect()
@@ -231,14 +266,19 @@ def _reconstruct(g: _Group, missing_pos: int) -> Tuple[ParsedHeader, bytes]:
     chunks = [pl for pos, (_h, pl) in g.media.items() if pos != missing_pos]
     chunks.append(g.fec_payload or b"")
     payload = xor_bytes(chunks)
-    if len(payload) > len(sib_pl):
-        payload = payload[: len(sib_pl)]
-    elif len(payload) < len(sib_pl):
-        payload = payload + bytes(len(sib_pl) - len(payload))
+    target_len = (
+        g.payload_lengths[missing_pos]
+        if g.payload_lengths is not None and missing_pos < len(g.payload_lengths)
+        else len(sib_pl)
+    )
+    if len(payload) > target_len:
+        payload = payload[:target_len]
+    elif len(payload) < target_len:
+        payload = payload + bytes(target_len - len(payload))
     hdr = replace(
         sib_hdr,
         seq=(g.start_seq + missing_pos) & SEQ_MASK,
-        flags=0,
+        flags=g.media_flags if g.fec_payload is not None else int(sib_hdr.flags),
         extra=missing_pos,
         recovered=True,
     )

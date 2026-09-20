@@ -16,6 +16,7 @@ from src.network_sender.protocol import (
     is_fec_packet,
     is_opus_packet,
     parse_header,
+    validate_payload,
 )
 
 
@@ -77,6 +78,27 @@ class HeaderSeqTests(unittest.TestCase):
     def test_mtu_pcm24_18ch_21(self) -> None:
         self.assertEqual(inspect_packet_mtu(21, 18, Codec.PCM24), 21 * 18 * 3)
         self.assertEqual(inspect_packet_mtu(21, 18, Codec.PCM16), 21 * 18 * 2)
+
+    def test_rejects_unknown_version_and_flags(self) -> None:
+        raw = bytearray(build_header(
+            codec=Codec.PCM16, sample_rate=48000, channels=1, nframes=8, seq=1
+        ))
+        raw[4] = 2
+        with self.assertRaisesRegex(ValueError, "versión"):
+            parse_header(bytes(raw))
+        raw[4] = 1
+        raw[6] = 0x80
+        with self.assertRaisesRegex(ValueError, "flags"):
+            parse_header(bytes(raw))
+
+    def test_validates_pcm_payload_size(self) -> None:
+        raw = build_header(
+            codec=Codec.PCM16, sample_rate=48000, channels=2, nframes=8, seq=1
+        )
+        hdr, _ = parse_header(raw)
+        validate_payload(hdr, bytes(8 * 2 * 2))
+        with self.assertRaisesRegex(ValueError, "PCM16"):
+            validate_payload(hdr, b"too short")
 
 
 class SendJitterBufferTests(unittest.TestCase):
